@@ -1,0 +1,25 @@
+{
+    "name": "server-bundler",
+    "version": "1.0.0",
+    "description": "Bundle, minify and run js/ts nodejs server apps with very fast compile time.",
+    "bin": "dist/index.mjs",
+    "type": "module",
+    "scripts": {
+        "start": "node esbuild.config.js"
+    },
+    "files": [
+        "dist/*"
+    ],
+    "author": "randrei122",
+    "dependencies": {
+        "@es-exec/esbuild-plugin-serve": "^0.0.5",
+        "@chialab/esbuild-plugin-commonjs": "^0.18.0",
+        "envfile": "^7.1.0",
+        "esbuild": "^0.20.2",
+        "yargs": "^17.7.2"
+    },
+    "devDependencies": {
+        "@types/node": "^20.12.7",
+        "@types/yargs": "^17.0.32"
+    }
+}

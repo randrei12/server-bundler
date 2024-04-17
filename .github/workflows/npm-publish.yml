@@ -1,0 +1,26 @@
+on:
+  release:
+    types: [created]
+
+jobs:
+  publish-npm:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 21
+          registry-url: https://registry.npmjs.org/
+
+      - name: "Create env File"
+        run: "cp .env.template .env"
+
+      - name: "Install Dependencies"
+        run: npm install
+
+      - name: "Build the app"
+        run: npm start
+
+      - run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.NPM_AUTH_TOKEN}}
