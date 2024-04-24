@@ -69,7 +69,7 @@ if (fs.existsSync(envFile)) {
     }
 }
 
-env["process.env.NODE_ENV"] = argv.production ? "production" : "development";
+env["process.env.NODE_ENV"] = argv.production ? `"production"` : `"development"`;
 
 const inputFile = argv.config ? path.resolve(path.dirname(argv.config), argv.file) : argv.file
     
