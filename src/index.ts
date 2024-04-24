@@ -64,7 +64,8 @@ if (fs.existsSync(envFile)) {
 
     for (const entry in entries) {
         const value: string = entries[entry];
-        env[`process.env.${entry}`] = value;
+        if (+value) env[`process.env.${entry}`] = value;
+        else env[`process.env.${entry}`] = `"${value}"`;
     }
 }
 
