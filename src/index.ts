@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 import commonjsPlugin from '@chialab/esbuild-plugin-commonjs';
 import serve from '@es-exec/esbuild-plugin-serve';
 //@ts-ignore
