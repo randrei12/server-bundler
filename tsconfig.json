@@ -1,0 +1,15 @@
+{
+    "compilerOptions": {
+        "module": "ESNext",
+        "moduleResolution": "Bundler",
+        "esModuleInterop": true,
+        "allowJs": false,
+        "strict": true,
+        "skipLibCheck": true,
+        "target": "ESNext",
+        "emitDeclarationOnly": true,
+        "declaration": true,
+        "outDir": "./dist",
+    },
+    "include": ["./src/index.ts"]
+}
