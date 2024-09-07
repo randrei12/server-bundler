@@ -1,6 +1,6 @@
 {
     "name": "server-bundler",
-    "version": "1.3.2",
+    "version": "1.4.0",
     "description": "Bundle, minify and run js/ts nodejs server apps with very fast compile time.",
     "bin": "dist/index.mjs",
     "type": "module",
@@ -17,7 +17,8 @@
         "@es-exec/esbuild-plugin-serve": "^0.0.5",
         "envfile": "^7.1.0",
         "esbuild": "^0.23.1",
-        "yargs": "^17.7.2"
+        "yargs": "^17.7.2",
+        "radash": "^12.1.0"
     },
     "devDependencies": {
         "@types/node": "^22.5.1",

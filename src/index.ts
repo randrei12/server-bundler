@@ -9,6 +9,7 @@ import fs from "node:fs";
 import path from "node:path";
 import yargs from "yargs";
 import { hideBin } from "yargs/helpers";
+import { objectify } from "radash";
 
 declare global {
     interface ImportMeta {
@@ -16,11 +17,18 @@ declare global {
     }
 }
 
+type Config = {
+    references?: Array<{ module: string, path: string, external?: boolean }>
+}
+let config: Config | null = null;
+
 const argv = await yargs(hideBin(process.argv))
     .config("config", configPath => {
         try {
             const rawData = fs.readFileSync(configPath, "utf-8");
-            return JSON.parse(rawData);
+            const parsed = JSON.parse(rawData)
+            config = parsed;
+            return parsed;
         } catch {
             return {};
         }
@@ -76,14 +84,14 @@ const argv = await yargs(hideBin(process.argv))
 
 class DefineValues {
     private env: Record<string, string> = {};
-    
+
     constructor() {
         this.addProperty("NODE_ENV", argv.production ? "production" : "development", "string", true);
     }
 
     addProperty(name: string, value: string, type: "string" | "number", process?: boolean) {
         const val = type === "number" ? value : `"${value}"`;
-        
+
         this.env[`import.meta.env.${name}`] = val;
         if (process) this.env[`process.env.${name}`] = val;
     }
@@ -104,7 +112,7 @@ if (fs.existsSync(envFile)) {
 
     for (const entry in entries) {
         env.addProperty(entry, entries[entry], Number.isNaN(+entries[entry]) ? "string" : "number", argv.bundleEnvVars);
-        
+
         // const value: string = entries[entry];
         // if (+value) env[`process.env.${entry}`] = value;
         // else env[`process.env.${entry}`] = `"${value}"`;
@@ -113,8 +121,8 @@ if (fs.existsSync(envFile)) {
 
 // env["process.env.NODE_ENV"] = argv.production ? `"production"` : `"development"`;
 
-const inputFile = argv.config ? path.resolve(path.dirname(argv.config), argv.file) : argv.file
-    
+const inputFile = argv.config ? path.resolve(path.dirname(argv.config), argv.file) : argv.file;
+
 const baseOptions = {
     entryPoints: [inputFile],
     outfile: argv.dist,
@@ -122,6 +130,8 @@ const baseOptions = {
     format: argv.format as BuildOptions["format"],
     bundle: true,
     define: env.export(),
+    //@ts-ignore
+    alias: objectify((config?.references || []) as Config["references"], reference => reference.module, reference => reference.path),
     plugins: [
         commonjsPlugin()
     ],
