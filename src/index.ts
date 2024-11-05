@@ -9,7 +9,7 @@ import fs from "node:fs";
 import path from "node:path";
 import yargs from "yargs";
 import { hideBin } from "yargs/helpers";
-import { objectify } from "radash";
+import { objectify, tryit } from "radash";
 
 declare global {
     interface ImportMeta {
@@ -75,6 +75,16 @@ const argv = await yargs(hideBin(process.argv))
         type: "string",
         description: "You can mark a file or a package as external to exclude it from your build. Instead of being bundled, the import will be preserved and will be evaluated at run time instead."
     })
+    .option("externalDependencies", {
+        default: false,
+        description: "If true all the dependencies from package.json will be external",
+        type: "boolean"
+    })
+    .option("packageJson", {
+        default: "./package.json",
+        description: "Package json path",
+        type: "string"
+    })
     .option("bundleEnvVars", {
         default: false,
         type: "boolean",
@@ -101,9 +111,25 @@ class DefineValues {
     }
 }
 
-const env = new DefineValues();
+async function getPackageJSON(path: string) {
+    const [err, rawData] = tryit(fs.readFileSync)(path);
+    if (err) {
+        if (path === "./package.json") {
+            return null;
+        } else {
+            throw new Error("The package.json file was not found");
+        }
+    }
 
-// let env = {};
+    return JSON.parse(rawData.toString()) as {
+        dependencies: Record<string, string>,
+    };
+}
+
+const packageJSON = await getPackageJSON(argv.packageJson);
+const externalDependencies = argv.externalDependencies ? Object.keys(packageJSON?.dependencies || {}) : [];
+
+const env = new DefineValues();
 
 const envFile = argv.config ? path.resolve(path.dirname(argv.config), argv.envFile) : argv.envFile;
 if (fs.existsSync(envFile)) {
@@ -135,7 +161,7 @@ const baseOptions = {
     plugins: [
         commonjsPlugin()
     ],
-    external: argv.external
+    external: [...argv.external, ...externalDependencies]
 } satisfies BuildOptions
 
 if (argv.production) {
