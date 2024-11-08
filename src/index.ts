@@ -159,7 +159,34 @@ const baseOptions = {
     //@ts-ignore
     alias: objectify((config?.references || []) as Config["references"], reference => reference.module, reference => reference.path),
     plugins: [
-        commonjsPlugin()
+        commonjsPlugin(),
+        {
+            name: "module-paths",
+            setup(build) {
+                const { modulePaths } = argv as (typeof argv & { modulePaths: { onlyInDev?: boolean, paths: Record<string, string> } });
+                if (modulePaths.onlyInDev && argv.production) return;
+
+                const modulesName = Object.keys(modulePaths.paths);
+                build.onResolve({ filter: new RegExp(`^(${modulesName.join("|")})`) }, args => {
+                    const dir = modulePaths.paths[args.path];
+                    if (!dir) return { path: args.path };
+
+                    const fileDir = path.resolve(process.cwd(), dir);
+                    let [matchedFile] = fs.globSync([fileDir, `${fileDir}.*`]);
+
+                    if (!matchedFile) {
+                        const [matchIndexFile] = fs.globSync(`${fileDir}/index.*`);
+                        matchedFile = matchIndexFile;
+                    }
+
+                    if (matchedFile) {
+                        return { path: matchedFile };
+                    }
+
+                    return { path: args.path };
+                });
+            },
+        }
     ],
     external: [...argv.external, ...externalDependencies]
 } satisfies BuildOptions
