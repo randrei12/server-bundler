@@ -1,6 +1,6 @@
 {
     "name": "server-bundler",
-    "version": "1.4.2",
+    "version": "1.4.3",
     "description": "Bundle, minify and run js/ts nodejs server apps with very fast compile time.",
     "bin": "dist/index.mjs",
     "type": "module",

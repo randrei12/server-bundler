@@ -158,6 +158,7 @@ const baseOptions = {
     define: env.export(),
     //@ts-ignore
     alias: objectify((config?.references || []) as Config["references"], reference => reference.module, reference => reference.path),
+    tsconfigRaw: "{}",
     plugins: [
         commonjsPlugin(),
         {
