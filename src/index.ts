@@ -165,7 +165,7 @@ const baseOptions = {
             name: "module-paths",
             setup(build) {
                 const { modulePaths } = argv as (typeof argv & { modulePaths: { onlyInDev?: boolean, paths: Record<string, string> } });
-                if (modulePaths.onlyInDev && argv.production) return;
+                if (!modulePaths || (modulePaths.onlyInDev && argv.production)) return;
 
                 const modulesName = Object.keys(modulePaths.paths);
                 build.onResolve({ filter: new RegExp(`^(${modulesName.join("|")})`) }, args => {
